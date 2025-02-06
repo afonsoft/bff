@@ -9,7 +9,7 @@ WORKDIR /app
 COPY . .
 
 # Build and publish the application and dependencies, self contained with linux runtime
-RUN dotnet restore ./src/Eaf.Template.Bff.Host/Eaf.Template.Bff.Host.csproj --ignore-failed-sources --configfile ./Nuget.config --verbosity minimal
+RUN dotnet restore ./src/Eaf.Template.Bff.Host/Eaf.Template.Bff.Host.csproj --ignore-failed-sources --verbosity minimal
 RUN dotnet publish /p:PublishTrimmed=false -c Release -o ./output ./src/Eaf.Template.Bff.Host/Eaf.Template.Bff.Host.csproj
 
 # Use Debian as base image

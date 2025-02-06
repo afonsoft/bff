@@ -1,0 +1,70 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:4000",
+      "sslPort": 4001
+    }
+  },
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://+:4000",
+        "DOTNET_URLS": "http://+:4000",
+        "PROXY": "http://proxy-sao-br.voegol.cloud:8080",
+        "NO_PROXY": ".voegol.cloud,.oraclevcn.com,.cluster.local,.havail.sabre.com,[a-z]+\\.voegol\\.com\\.br$,[a-z]+\\.voegol\\.cloud$",
+        "AuthenticationConfiguration__Authority": "https://hom-auth-api.voegol.cloud",
+        "AuthenticationConfiguration__ValidAudiences": "b2b.voegol.com.br/CERT,b2c.voegol.com.br/CERT,comprassite.b2c.voegol.com.br/CERT,app.b2c.voegol.com.br/CERT,kiosk.voegol.com.br/CERT,kiosk.b2c.voegol.com.br/CERT,comprassite.b2b.voebol.com.br/CERT,minhasviagens.b2c.voegol.com.br/CERT,checkinweb.b2c.voegol.com.br/CERT,groupoptimizer.voegol.com.br/CERT,ix.voegol.com.br/CERT",
+        "DigitalConnect__Environment": "Default",
+        "GolInstrumentationConfiguration__LoggingMiddlewareConfiguration__Enabled": "true",
+        "GolInstrumentationConfiguration__LoggingHttpClientDelegatingHandlerConfiguration__Enabled": "true",
+        "ShowExceptionDetails": "true",
+        "Serilog__MinimumLevel__Default": "Debug",
+        "BFF_API_URL_INVOLUNTARYEXCHANGE": "https://hom-involuntaryexchange-api-int.voegol.cloud",
+        "BFF_API_URL_CHANNEL": "https://hom-channelcfg-api.voegol.com.br",
+        "BFF_API_URL_PROFILESYNC": "https://hom-profilesync-api.voegol.cloud",
+        "BFF_API_URL_BCB": "https://www3.bcb.gov.br/informes/rest/pessoasJuridicas",
+        "BFF_API_URL_FEBRABAN": "https://portal.febraban.org.br/Associado/Index"
+      }
+    },
+    "Eaf.Template.Bff.Host": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://+:4000",
+        "DOTNET_URLS": "http://+:4000",
+        "PROXY": "http://proxy-sao-br.voegol.cloud:8080",
+        "NO_PROXY": ".voegol.cloud,.oraclevcn.com,.cluster.local,.havail.sabre.com,[a-z]+\\.voegol\\.com\\.br$,[a-z]+\\.voegol\\.cloud$",
+        "AuthenticationConfiguration__Authority": "https://hom-auth-api.voegol.cloud",
+        "AuthenticationConfiguration__ValidAudiences": "b2b.voegol.com.br/CERT,b2c.voegol.com.br/CERT,comprassite.b2c.voegol.com.br/CERT,app.b2c.voegol.com.br/CERT,kiosk.voegol.com.br/CERT,kiosk.b2c.voegol.com.br/CERT,comprassite.b2b.voebol.com.br/CERT,minhasviagens.b2c.voegol.com.br/CERT,checkinweb.b2c.voegol.com.br/CERT,groupoptimizer.voegol.com.br/CERT,ix.voegol.com.br/CERT",
+        "DigitalConnect__Environment": "Default",
+        "GolInstrumentationConfiguration__LoggingMiddlewareConfiguration__Enabled": "true",
+        "GolInstrumentationConfiguration__LoggingHttpClientDelegatingHandlerConfiguration__Enabled": "true",
+        "ShowExceptionDetails": "true",
+        "Serilog__MinimumLevel__Default": "Debug",
+        "BFF_API_URL_INVOLUNTARYEXCHANGE": "https://hom-involuntaryexchange-api-int.voegol.cloud",
+        "BFF_API_URL_CHANNEL": "https://hom-channelcfg-api.voegol.com.br",
+        "BFF_API_URL_PROFILESYNC": "https://hom-profilesync-api.voegol.cloud",
+        "BFF_API_URL_BCB": "https://www3.bcb.gov.br/informes/rest/pessoasJuridicas",
+        "BFF_API_URL_FEBRABAN": "https://portal.febraban.org.br/Associado/Index"
+      },
+      "dotnetRunMessages": "true",
+      "applicationUrl": "https://localhost:4001;http://localhost:4000"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "publishAllPorts": true,
+      "useSSL": true
+    }
+  }
+}

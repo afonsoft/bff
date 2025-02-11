@@ -9,8 +9,8 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection ConfigAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
-            string authority = configuration.GetValue<string>("AuthenticationConfiguration:Authority") ?? "https://hom-auth-api.voegol.cloud";
-            string[] validAudiences = (configuration.GetValue<string>("AuthenticationConfiguration:ValidAudiences") ?? "b2b.voegol.com.br/CERT,b2c.voegol.com.br/CERT").Split(',');
+            string authority = configuration.GetValue<string>("AuthenticationConfiguration:Authority") ;
+            string[] validAudiences = configuration.GetValue<string>("AuthenticationConfiguration:ValidAudiences").Split(',');
 
             services.AddAuthentication(x =>
             {

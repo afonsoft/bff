@@ -2,11 +2,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eaf.Template.Bff.Host", "src\Gol.Mv.Reac.Bff.Host\Eaf.Template.Bff.Host.csproj", "{D482909E-3BD0-428C-9E0E-788E4E72ADA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eaf.Template.Bff.Host", "src\Eaf.Template.Bff.Host\Eaf.Template.Bff.Host.csproj", "{D482909E-3BD0-428C-9E0E-788E4E72ADA4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eaf.Template.Bff.Core", "src\Gol.Mv.Reac.Bff.Core\Eaf.Template.Bff.Core.csproj", "{CD1F4C2D-C1BB-449A-98EF-E53165F335CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eaf.Template.Bff.Core", "src\Eaf.Template.Bff.Core\Eaf.Template.Bff.Core.csproj", "{CD1F4C2D-C1BB-449A-98EF-E53165F335CA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eaf.Template.Bff.Proxy", "src\Gol.Mv.Reac.Bff.Proxy\Eaf.Template.Bff.Proxy.csproj", "{7441F04F-21B8-4F9C-9596-5EE4709AC3E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eaf.Template.Bff.Proxy", "src\Eaf.Template.Bff.Proxy\Eaf.Template.Bff.Proxy.csproj", "{7441F04F-21B8-4F9C-9596-5EE4709AC3E1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0EF9CBB9-EE37-4BB1-B2B3-827770964200}"
 EndProject

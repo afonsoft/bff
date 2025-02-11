@@ -58,7 +58,7 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\Gol.Mv.Reac.Bff.Proxy\Eaf.Template.Bff.Proxy.csproj" />
+    <ProjectReference Include="..\Eaf.Template.Bff.Proxy\Eaf.Template.Bff.Proxy.csproj" />
   </ItemGroup>
 
 

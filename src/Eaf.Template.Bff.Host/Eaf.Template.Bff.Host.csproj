@@ -32,8 +32,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Gol.Mv.Reac.Bff.Core\Eaf.Template.Bff.Core.csproj" />
-	  <ProjectReference Include="..\Gol.Mv.Reac.Bff.Proxy\Eaf.Template.Bff.Proxy.csproj" />
+	  <ProjectReference Include="..\Eaf.Template.Bff.Core\Eaf.Template.Bff.Core.csproj" />
+	  <ProjectReference Include="..\Eaf.Template.Bff.Proxy\Eaf.Template.Bff.Proxy.csproj" />
 	</ItemGroup>
 
 

@@ -1,4 +1,32 @@
-# Introduction 
-BFF é a sigla para Back-end for Front-end, um padrão arquitetônico usado no desenvolvimento de aplicações web. Ele é um componente de back-end que fornece dados para os front-ends de uma aplicação. 
-O BFF permite que os aplicativos clientes recebam dados personalizados e otimizados de acordo com as suas necessidades. Isso resulta em uma melhor experiência do usuário, maior desempenho, eficiência e escalabilidade. 
-O BFF funciona como uma camada intermediária entre os front-ends e os back-ends de uma aplicação. Ele permite que as equipes iterem recursos mais rapidamente e tenham controle sobre o back-end. 
+# Back-end for Front-end (BFF)
+
+## Introduction
+
+BFF stands for Back-end for Front-end, an architectural pattern used in web application development. It is a backend component that provides data to the frontends of an application.
+
+## Benefits
+
+The BFF allows client applications to receive customized and optimized data according to their needs. This results in a better user experience, greater performance, efficiency, and scalability.
+
+## Functionality
+
+The BFF functions as an intermediary layer between the frontends and backends of an application. It allows teams to iterate on features more quickly and have control over the backend.
+
+## Example Usage
+
+(This section will be expanded with specific examples later.)
+
+
+## Architecture
+
+(This section will be expanded with a diagram and more details later.)
+
+
+## Contributing
+
+Contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute.
+
+
+
+
+

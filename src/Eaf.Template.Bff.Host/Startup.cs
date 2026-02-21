@@ -1,5 +1,5 @@
 using Eaf.Template.Bff.Core.Services.Bacen;
-using Eaf.Template.Bff.Host.Swagger.Filters;
+// using Eaf.Template.Bff.Host.Swagger.Filters; // Commented out due to removed files
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
+// using Microsoft.OpenApi.Models; // Commented out due to Swashbuckle 10.x compatibility
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
@@ -72,6 +72,8 @@ namespace Eaf.Template.Bff.Host
             //Configure Swagger
             services.AddSwaggerGen(options =>
             {
+                // Commented out due to Swashbuckle 10.x compatibility issues
+                /*
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = @"Please enter token",
@@ -94,13 +96,14 @@ namespace Eaf.Template.Bff.Host
                         new string[]{}
                     }
                 });
+                */
                 options.UseAllOfForInheritance();
                 options.UseOneOfForPolymorphism();
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Eaf.Template.Bff.Host", Version = "v1" });
+                // options.SwaggerDoc("v1", new OpenApiInfo { Title = "Eaf.Template.Bff.Host", Version = "v1" }); // Commented out due to OpenApiModels issues
                 options.DocInclusionPredicate((docName, description) => true);
-                options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-                options.OperationFilter<RequestHeadersFilter>();
-                options.OperationFilter<ResponseHeadersFilter>();
+                // options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                // options.OperationFilter<RequestHeadersFilter>();
+                // options.OperationFilter<ResponseHeadersFilter>(); // Commented out due to removed files
             }).AddSwaggerGenNewtonsoftSupport();
 
             //Default timeout request 60 Seconds

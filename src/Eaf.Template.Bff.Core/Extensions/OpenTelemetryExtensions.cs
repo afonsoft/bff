@@ -43,11 +43,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     o.RecordException = true;
                 })
-                .AddEntityFrameworkCoreInstrumentation(o =>
-                {
-                    o.SetDbStatementForStoredProcedure = true;
-                    o.SetDbStatementForText = true;
-                })
+                .AddEntityFrameworkCoreInstrumentation()
+                // .AddEntityFrameworkCoreInstrumentation(o =>
+                // {
+                //     o.SetDbStatementForStoredProcedure = true;
+                //     o.SetDbStatementForText = true;
+                // }) // API methods not available in current version
                 .AddHangfireInstrumentation(o =>
                 {
                     o.RecordException = true;

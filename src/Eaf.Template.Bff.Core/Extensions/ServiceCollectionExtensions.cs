@@ -23,9 +23,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddEndpointsApiExplorer();
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            // services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>(); // Deprecated in .NET 8+
             services.TryAddSingleton<ICacheManager, CacheManager>();
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            // services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); // Updated to use assembly scanning
 
             //SignalR and Web-sockets
             services.AddSignalR(options =>

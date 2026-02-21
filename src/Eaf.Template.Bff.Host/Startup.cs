@@ -1,5 +1,4 @@
 using Eaf.Template.Bff.Core.Services.Bacen;
-// using Eaf.Template.Bff.Host.Swagger.Filters; // Commented out due to removed files
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-// using Microsoft.OpenApi.Models; // Commented out due to Swashbuckle 10.x compatibility
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
@@ -69,42 +68,11 @@ namespace Eaf.Template.Bff.Host
             //Configure IDistributedCache
             services.ConfigDistributedCache(Configuration);
 
+            // Configure OpenTelemetry for tracing, metrics, and logging
+            services.ConfigOpenTelemetry(); // Using existing extension from Core
+
             //Configure Swagger
-            services.AddSwaggerGen(options =>
-            {
-                // Commented out due to Swashbuckle 10.x compatibility issues
-                /*
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Description = @"Please enter token",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "Bearer"
-                });
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type=ReferenceType.SecurityScheme,
-                                Id="Bearer"
-                            }
-                        },
-                        new string[]{}
-                    }
-                });
-                */
-                options.UseAllOfForInheritance();
-                options.UseOneOfForPolymorphism();
-                // options.SwaggerDoc("v1", new OpenApiInfo { Title = "Eaf.Template.Bff.Host", Version = "v1" }); // Commented out due to OpenApiModels issues
-                options.DocInclusionPredicate((docName, description) => true);
-                // options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-                // options.OperationFilter<RequestHeadersFilter>();
-                // options.OperationFilter<ResponseHeadersFilter>(); // Commented out due to removed files
-            }).AddSwaggerGenNewtonsoftSupport();
+            services.AddSwaggerGen();
 
             //Default timeout request 60 Seconds
             services.AddRequestTimeouts(opts => opts.DefaultPolicy = new RequestTimeoutPolicy { Timeout = TimeSpan.FromMicroseconds(60) });

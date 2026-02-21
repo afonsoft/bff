@@ -21,18 +21,18 @@ namespace Microsoft.Extensions.DependencyInjection
 
             var retry = new Http.Resilience.HttpRetryStrategyOptions
             {
-                MaxRetryAttempts = 2,
+                MaxRetryAttempts = 3,
                 Delay = TimeSpan.FromMilliseconds(300),
                 MaxDelay = TimeSpan.FromSeconds(1),
                 ShouldHandle = arguments => arguments.Outcome switch
                 {
                     { Exception: HttpRequestException } => PredicateResult.True(),
-                    { Result: HttpResponseMessage response } when response.StatusCode == HttpStatusCode.InternalServerError => PredicateResult.True(),
+                    { Result: HttpResponseMessage response } when response.StatusCode >= HttpStatusCode.InternalServerError => PredicateResult.True(),
                     _ => PredicateResult.False(),
                 },
                 OnRetry = arguments =>
                 {
-                    Log.Logger.Warning("[RESILIENCE][RETRY]Retry Attempt Number {0} after {1} seconds", arguments.AttemptNumber, arguments.RetryDelay.TotalSeconds);
+                    Log.Logger.Warning("[RESILIENCE][RETRY] Retry Attempt {0} after {1} seconds", arguments.AttemptNumber, arguments.RetryDelay.TotalSeconds);
                     return default;
                 }
             };
@@ -43,26 +43,17 @@ namespace Microsoft.Extensions.DependencyInjection
                 FailureRatio = 0.5,
                 SamplingDuration = TimeSpan.FromMinutes(10),
                 MinimumThroughput = 5,
-                BreakDurationGenerator = static args => new ValueTask<TimeSpan>(TimeSpan.FromMinutes(args.FailureCount)),
                 ShouldHandle = arguments => arguments.Outcome switch
                 {
                     { Exception: HttpRequestException } => PredicateResult.True(),
-                    { Result: HttpResponseMessage response } when response.StatusCode == HttpStatusCode.InternalServerError => PredicateResult.True(),
+                    { Result: HttpResponseMessage response } when response.StatusCode >= HttpStatusCode.InternalServerError => PredicateResult.True(),
                     _ => PredicateResult.False(),
                 }
             };
 
-            var attemptTimeout = new Http.Resilience.HttpTimeoutStrategyOptions
+            var timeoutStrategy = new Http.Resilience.HttpTimeoutStrategyOptions
             {
-                //Limite timeout
-                Timeout = TimeSpan.FromMinutes(5),
-
-                // Register user callback called whenever timeout occurs
-                OnTimeout = _ =>
-                {
-                    Log.Logger.Warning("[RESILIENCE][TIMEOUT] Timeout Execution");
-                    return default;
-                },
+                Timeout = TimeSpan.FromMinutes(5)
             };
 
             #endregion StrategyOptions
@@ -71,38 +62,28 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddResiliencePipeline<string, HttpResponseMessage>("Default", (builder, context) =>
             {
                 builder
-                .AddRetry(retry)
-                .AddCircuitBreaker(circuitBreaker)
-                .AddTimeout(attemptTimeout);
+                    .AddRetry(retry)
+                    .AddCircuitBreaker(circuitBreaker)
+                    .AddTimeout(timeoutStrategy);
             });
-
-            //Configure Resilience/Polly for BacenClient
-#pragma warning disable CS8603 // Possível retorno de referência nula.
+            
+            // Configure individual clients with resilience
             services.AddHttpClient<FebrabanClient>()
                 .AddStandardResilienceHandler(configure =>
                 {
-                    #region StrategyOptions
-
                     configure.Retry = retry;
                     configure.CircuitBreaker = circuitBreaker;
-                    configure.TotalRequestTimeout = attemptTimeout;
-
-                    #endregion StrategyOptions
+                    configure.TotalRequestTimeout = timeoutStrategy;
                 });
-
             services.AddHttpClient<BcbClient>()
                 .AddStandardResilienceHandler(configure =>
                 {
-                    #region StrategyOptions
-
                     configure.Retry = retry;
                     configure.CircuitBreaker = circuitBreaker;
-                    configure.TotalRequestTimeout = attemptTimeout;
-
-                    #endregion StrategyOptions
+                    configure.TotalRequestTimeout = timeoutStrategy;
                 });
-           
-#pragma warning disable CS8603 // Possível retorno de referência nula.
+            
+            #pragma warning disable CS8603 // Possível retorno de referência nula.
         }
     }
 }

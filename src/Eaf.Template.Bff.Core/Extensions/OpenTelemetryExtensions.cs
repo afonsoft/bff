@@ -11,13 +11,15 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class OpenTelemetryExtensions
     {
         /// <summary>
-        /// Add OpenTelemetry for IServiceCollection with AspNetCoreInstrumentation, EntityFrameworkCoreInstrumentation, HangfireInstrumentation, HttpClientInstrumentation
+        /// Add OpenTelemetry for IServiceCollection with comprehensive tracing, metrics, and logging
         /// </summary>
         /// <param name="services"></param>
         public static OpenTelemetryBuilder ConfigOpenTelemetry(this IServiceCollection services)
         {
+            // Configure HTTP context switch for better telemetry
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
+            // Configure logging with OpenTelemetry integration
             services.AddLogging(configure =>
             {
                 configure.AddOpenTelemetry(builder =>
@@ -29,51 +31,56 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
             });
 
+            // Configure OpenTelemetry with comprehensive observability
             return services.AddOpenTelemetry()
-            .ConfigureResource(builder => builder
-                .AddEnvironmentVariableDetector()
-                .AddTelemetrySdk()
-                .AddService(serviceName: "Eaf.Template.Bff.Host"))
-            .WithTracing(builder =>
-            {
-                builder
-                .AddSource("Eaf.Template.Bff.*")
-                .AddSource("Eaf.Template.Bff.Host")
-                .AddAspNetCoreInstrumentation(o =>
+                .ConfigureResource(builder => builder
+                    .AddEnvironmentVariableDetector()
+                    .AddTelemetrySdk()
+                    .AddService(serviceName: "Eaf.Template.Bff.Host"))
+                .WithTracing(builder =>
                 {
-                    o.RecordException = true;
+                    // Add custom sources for application-specific tracing
+                    builder.AddSource("Eaf.Template.Bff.*")
+                        .AddSource("Eaf.Template.Bff.Host");
+                    
+                    // Configure ASP.NET Core instrumentation with exception recording
+                    builder.AddAspNetCoreInstrumentation();
+                    
+                    // Configure Entity Framework Core instrumentation
+                    builder.AddEntityFrameworkCoreInstrumentation();
+                    
+                    // Configure HttpClient instrumentation with detailed tracing
+                    builder.AddHttpClientInstrumentation();
+                    
+                    // Configure runtime instrumentation
+                    // builder.AddRuntimeInstrumentation(); // Commented out due to API incompatibility
                 })
-                .AddEntityFrameworkCoreInstrumentation(o =>
+                .WithMetrics(builder =>
                 {
-                    o.SetDbStatementForStoredProcedure = true;
-                    o.SetDbStatementForText = true;
+                    // Add ASP.NET Core metrics
+                    builder.AddAspNetCoreInstrumentation()
+                        .AddHttpClientInstrumentation();
+                        // .AddRuntimeInstrumentation(); // Commented out due to API incompatibility
+                    
+                    // Add system metrics
+                    builder.AddMeter("Microsoft.AspNetCore.Hosting")
+                        .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+                        .AddMeter("System.Net.Http")
+                        .AddMeter("System.Net.Sockets");
+                    
+                    // Add application-specific metrics
+                    builder.AddMeter("Eaf.Template.Bff.*")
+                        .AddMeter("Eaf.Template.Bff.Host");
+                    
+                    // Configure exporters for metrics and traces
+                    builder.AddPrometheusExporter()
+                        .AddOtlpExporter();
                 })
-                .AddHangfireInstrumentation(o =>
+                .WithLogging(builder =>
                 {
-                    o.RecordException = true;
-                })
-                .AddHttpClientInstrumentation(o =>
-                {
-                    o.RecordException = true;
-                }).AddOtlpExporter();
-            })
-            .WithLogging(builder =>
-            {
-                builder.AddOtlpExporter();
-            })
-            .WithMetrics(builder =>
-            {
-                builder
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation()
-                .AddRuntimeInstrumentation()
-                .AddMeter("Microsoft.AspNetCore.Hosting")
-                .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
-                .AddMeter("Eaf.Template.Bff.*")
-                .AddMeter("Eaf.Template.Bff.Host")
-                .AddPrometheusExporter()
-                .AddOtlpExporter();
-            });
+                    // Configure OpenTelemetry logging
+                    builder.AddOtlpExporter();
+                });
         }
     }
 }

@@ -41,18 +41,18 @@ jobs:
 
       - name: Restore Dependencies
         run: |
-          echo "Restoring NuGet packages for MetarDecoder.sln"
-          dotnet restore MetarDecoder.sln --no-cache --force --verbosity normal
+          echo "Restoring NuGet packages for Eaf.Template.Bff.sln"
+          dotnet restore Eaf.Template.Bff.sln --no-cache --force --verbosity normal
 
       - name: Build Solution
         run: |
-          echo "Building MetarDecoder.sln"
-          dotnet build MetarDecoder.sln --no-restore --configuration Release --verbosity minimal
+          echo "Building Eaf.Template.Bff.sln"
+          dotnet build Eaf.Template.Bff.sln --no-restore --configuration Release --verbosity minimal
 
       - name: Run Tests
         run: |
-          echo "Running tests for MetarDecoder.sln"
-          dotnet test tests/Metar.Decoder.Tests/ \
+          echo "Running tests for Eaf.Template.Bff.sln"
+          dotnet test tests/Eaf.Template.Bff.Tests/ \
             --configuration Release \
             --logger "trx;LogFileName=test-results.trx" \
             --results-directory TestResults \
@@ -115,13 +115,13 @@ jobs:
 
       - name: Restore Dependencies
         run: |
-          echo "Restoring NuGet packages for MetarDecoder.sln"
-          dotnet restore MetarDecoder.sln --no-cache --force --verbosity normal
+          echo "Restoring NuGet packages for Eaf.Template.Bff.sln"
+          dotnet restore Eaf.Template.Bff.sln --no-cache --force --verbosity normal
 
       - name: Build Solution
         run: |
-          echo "Building MetarDecoder.sln"
-          dotnet build MetarDecoder.sln --no-restore --configuration Release --verbosity minimal
+          echo "Building Eaf.Template.Bff.sln"
+          dotnet build Eaf.Template.Bff.sln --no-restore --configuration Release --verbosity minimal
 
       - name: Run .NET Framework Tests
         run: |
@@ -152,10 +152,10 @@ jobs:
       - name: 📥 Checkout Code
         uses: actions/checkout@v6
 
-      - name: 🔍 Security Scan (Metar Decoder)
+      - name: 🔍 Security Scan (EAF Template BFF)
         run: |
-          echo "🔒 Running security scan on metar-decoder"
-          dotnet list MetarDecoder.sln package --vulnerable
+          echo "🔒 Running security scan on EAF Template BFF"
+          dotnet list Eaf.Template.Bff.sln package --vulnerable
 
       - name: 📊 Code Quality Analysis
         run: |
@@ -201,7 +201,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: 🔧 Restore dependencies
-        run: dotnet restore MetarDecoder.sln --ignore-failed-sources
+        run: dotnet restore Eaf.Template.Bff.sln --ignore-failed-sources
 
       - name: 📦 Install ReportGenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool

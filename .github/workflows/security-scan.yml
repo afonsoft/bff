@@ -57,7 +57,7 @@ jobs:
           dotnet-version: "10.0.x"
 
       - name: 🔧 Restore Dependencies
-        run: dotnet restore MetarDecoder.sln --ignore-failed-sources
+        run: dotnet restore Eaf.Template.Bff.sln --ignore-failed-sources
 
       - name: 🛡️ Install Snyk CLI
         run: |
@@ -121,14 +121,14 @@ jobs:
           echo "✅ SONAR_TOKEN is configured"
           dotnet sonarscanner begin \
             /o:"afonsoft" \
-            /k:"afonsoft_metar-decoder" \
+            /k:"afonsoft_bff" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.scm.provider=git \
             /d:sonar.coverage.exclusions="**Test*.cs"
 
       - name: 🏗️ Build
-        run: dotnet build MetarDecoder.sln --configuration release
+        run: dotnet build Eaf.Template.Bff.sln --configuration release
 
       - name: 🔍 Run Code Analysis
         run: |

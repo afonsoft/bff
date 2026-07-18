@@ -27,18 +27,21 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
   - `Microsoft.Extensions.Configuration.Abstractions` 10.0.3 → 10.0.10
   - `Microsoft.Extensions.Http.Resilience` 9.3.0 → 10.8.0
   - `Microsoft.Extensions.ServiceDiscovery` 9.1.0 → 10.8.0
+  - `Microsoft.OpenApi` 2.7.5 → 3.9.0
   - `Newtonsoft.Json` 13.0.3 → 13.0.4
   - `OpenTelemetry.*` 1.15.0 → 1.17.0
   - `Serilog.Settings.Configuration` 10.0.1-dev-02330 → 10.0.1
   - `Swashbuckle.AspNetCore.*` 10.1.4 → 10.2.3
   - `System.Security.Cryptography.Pkcs` 9.0.3 → 10.0.10
   - Pacotes de teste atualizados para `Microsoft.NET.Test.Sdk` 18.8.1, `xunit.runner.visualstudio` 3.1.5, `coverlet.collector` 10.0.1 e `FluentAssertions` 8.10.0.
+  - Referências diretas adicionadas para atualizar pacotes transitivos: `Hangfire.Core` 1.8.24, `Microsoft.Bcl.Cryptography` 10.0.10, `Microsoft.Extensions.Configuration.EnvironmentVariables` 10.0.10, `Microsoft.Extensions.DependencyModel` 10.0.10, `Polly.Core/Extensions/RateLimiting` 8.7.0, `Serilog` 4.4.0 e `System.Threading.RateLimiting` 10.0.10.
 - `LangVersion` atualizado para `14.0` em todos os projetos.
-- Reescrita dos workflows do GitHub Actions baseada em `afonsoft/metar-decoder`, adaptada para a solução `Eaf.Template.Bff.sln`:
-  - `ci-build-test.yml` — build, testes, formatação, cobertura e validação de vulnerabilidades.
+- Reescrita dos workflows do GitHub Actions baseada em `afonsoft/metar-decoder` e `afonsoft/QRCoder.Core`, adaptada para a solução `Eaf.Template.Bff.sln`:
+  - `ci-build-test.yml` — build, testes, formatação, cobertura e validação de vulnerabilidades; adicionados gatilhos `devin/*` e `workflow_dispatch`.
   - `code-quality.yml` — Qodana, SonarQube, Snyk e métricas de qualidade.
-  - `security-scan.yml` — CodeQL, Snyk e SonarQube em agendamento.
-  - `deploy-publish.yml` — ajustado para disparar apenas em tags `v*` e releases publicadas, e substituído `actions/create-release` por `softprops/action-gh-release`.
+  - `security-scan.yml` — CodeQL, Snyk e SonarQube em agendamento; ações `github/codeql-action` atualizadas para v4.
+  - `deploy-publish.yml` — ajustado para disparar apenas em tags `v*` e releases publicadas, substituído `actions/create-release` por `softprops/action-gh-release`, e adicionado `environment: production` ao job de build Docker.
+- `README.md` reescrito em inglês (en-US) como padrão; `docs/README.md` mantido em português (pt-BR) como tradução complementar.
 
 ### Fixed
 - Correção de warnings de build:

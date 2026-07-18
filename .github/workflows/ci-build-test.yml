@@ -6,10 +6,17 @@ on:
       - "feature/*"
       - "bug/*"
       - "hotfix/*"
+      - "devin/*"
   pull_request:
     branches:
       - "main"
-    types: [opened, synchronize, reopened, closed]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
 
 env:
   DOTNET_VERSION: "10.0.x"
@@ -21,6 +28,10 @@ jobs:
   build-bff:
     name: Build & Test BFF (.NET 10)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
 
     steps:
       - name: Checkout Code

@@ -111,7 +111,7 @@ namespace Eaf.Template.Bff.Proxy.Bacen
     internal class BcbResponse
     {
         [JsonProperty("content")]
-        public List<BcbBank> Content { get; set; }
+        public List<BcbBank> Content { get; set; } = new List<BcbBank>();
 
         [JsonProperty("totalPages")]
         public int TotalPages { get; set; }
@@ -132,7 +132,7 @@ namespace Eaf.Template.Bff.Proxy.Bacen
         public int NumberOfElements { get; set; }
 
         [JsonProperty("sort")]
-        public object Sort { get; set; }
+        public object Sort { get; set; } = new object();
 
         [JsonProperty("first")]
         public bool First { get; set; }

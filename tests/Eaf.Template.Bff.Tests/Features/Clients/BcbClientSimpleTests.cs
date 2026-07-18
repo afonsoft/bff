@@ -1,7 +1,7 @@
 using Eaf.Template.Bff.Proxy.Bacen;
 using System.Net.Http;
 
-namespace Eaf.Template.Bff.Tests.Features.HttpClient;
+namespace Eaf.Template.Bff.Tests.Features.Clients;
 
 /// <summary>
 /// Testes unitários simplificados para o BcbClient

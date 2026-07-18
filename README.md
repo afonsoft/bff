@@ -1,232 +1,219 @@
 # EAF Template BFF
 
-## Overview
+![CI Build & Test](https://github.com/afonsoft/bff/actions/workflows/ci-build-test.yml/badge.svg)
+![Security Scan](https://github.com/afonsoft/bff/actions/workflows/security-scan.yml/badge.svg)
+![Code Quality](https://github.com/afonsoft/bff/actions/workflows/code-quality.yml/badge.svg)
+![.NET 10](https://img.shields.io/badge/.NET-10.0-purple)
+![License](https://img.shields.io/github/license/afonsoft/bff)
 
-EAF Template BFF (Back-end for Front-end) is a .NET 10.0 template implementing BFF architectural pattern with modern best practices, SOLID principles, and Clean Architecture.
+## Descrição do Projeto
 
-## Purpose
+O **EAF Template BFF** é um template .NET 10 de **Back-end for Front-end (BFF)** que expõe dados normalizados de instituições financeiras (Bacen, BCB e Febraban) para aplicações frontend. Ele aplica **Clean Architecture**, princípios **SOLID** e padrões de resiliência, oferecendo um ponto único, seguro e cacheável para consumo das APIs externas.
 
-BFF stands for Back-end for Front-end, an architectural pattern that provides a dedicated backend component to serve data specifically optimized for different frontend applications. This results in better user experience, improved performance, and enhanced scalability.
+- Centraliza a comunicação com APIs legadas e instáveis.
+- Aplica fallback entre Febraban (fonte primária) e BCB (fonte secundária).
+- Usa cache distribuído compactado para reduzir latência e carga nos serviços externos.
+- Fornece observabilidade via OpenTelemetry e logs estruturados com Serilog.
 
-## Features
-
-- .NET 10.0 with latest C# features
-- Clean Architecture with clear separation of concerns
-- SOLID Principles implementation
-- Docker Support with Alpine Linux optimization
-- Comprehensive Testing with xUnit, Moq, and FluentAssertions
-- Code Coverage tracking and reporting
-- GitHub Actions CI/CD pipeline
-- OpenTelemetry integration for observability
-- Serilog structured logging
-- Health Checks for monitoring
-
-## Architecture
+## Estrutura do Repositório
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend     │    │   BFF API      │    │  External APIs  │
-│   (React/Angular)│◄──►│   (.NET 10.0)   │◄──►│  (Bacen/Febraban)│
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+.
+├── src/
+│   ├── Eaf.Template.Bff.Core/        # Domínio, serviços, cache, middlewares, extensões
+│   ├── Eaf.Template.Bff.Proxy/       # Clientes HTTP para Bacen/BCB e Febraban
+│   └── Eaf.Template.Bff.Host/        # API ASP.NET Core, controllers e Swagger
+├── tests/
+│   └── Eaf.Template.Bff.Tests/       # Testes xUnit com Moq, FluentAssertions, Shouldly e NSubstitute
+├── .github/workflows/                 # CI/CD, qualidade e segurança
+├── docs/                              # Documentação complementar em português
+├── .claude/                           # Configurações e regras do harness para Claude Code
+├── .devin/                            # Configurações e hooks do harness para Devin
+├── CLAUDE.md                          # Índice do harness para agentes
+├── README.md                          # Este arquivo
+└── CHANGELOG.md                       # Histórico de mudanças
 ```
 
-### Project Structure
+### Detalhamento por Camada
 
+- **`src/Eaf.Template.Bff.Core`** — Lógica de domínio, serviços (`BacenService`), cache (`CacheManager`), middleware de tratamento de exceções, extensões de DI, perfis do AutoMapper e configuração de OpenTelemetry/Serilog.
+- **`src/Eaf.Template.Bff.Proxy`** — Clientes `FebrabanClient` e `BcbClient` com normalização de `BaseUrl`, serialização Newtonsoft.Json e tratamento de respostas JSON específicas.
+- **`src/Eaf.Template.Bff.Host`** — Controllers (`BacenController`, `BaseController`), `Startup`, `Program` e Swagger.
+- **`tests/Eaf.Template.Bff.Tests`** — Testes organizados em `Features/{Cache,Clients,Controllers,Extensions,Mappings,Models,Services}` com helpers fakes (`FakeCacheManager`, `FakeDistributedCache`, `MockHttpMessageHandler`).
+
+## Stack Tecnológica
+
+| Camada | Tecnologia |
+|--------|-----------|
+| Runtime | .NET 10.0 / C# 14 |
+| Web API | ASP.NET Core |
+| Mapeamento | AutoMapper 16.2.0 |
+| Logs | Serilog (Console, ASP.NET Core, Settings Configuration) |
+| Observabilidade | OpenTelemetry 1.17.0 (ASP.NET Core, Http, Runtime, OTLP, Prometheus) |
+| Resiliência | Microsoft.Extensions.Http.Resilience 10.8.0 |
+| Cache | IDistributedCache com compressão GZip |
+| Autenticação | JWT Bearer (Microsoft.AspNetCore.Authentication.JwtBearer 10.0.10) |
+| Documentação API | Swashbuckle.AspNetCore 10.2.3 + Microsoft.OpenApi 2.7.5 |
+| Serialização | Newtonsoft.Json 13.0.4 |
+| Testes | xUnit, Moq, FluentAssertions 8.10.0, Shouldly 4.3.0, NSubstitute 6.0.0 |
+| CI/CD | GitHub Actions |
+| Qualidade | SonarCloud/SonarQube, Snyk, CodeQL, Qodana |
+| Container | Docker (Alpine Linux) |
+
+## Arquitetura
+
+O projeto segue **Clean Architecture** com três camadas principais:
+
+1. **Core (Domínio/Aplicação)** — Independente de frameworks externos. Contém regras de negócio, serviços, contratos (`IBacenService`, `ICacheManager`) e models.
+2. **Proxy (Infraestrutura)** — Clientes HTTP e adaptadores para APIs externas. Depende apenas de bibliotecas de infraestrutura.
+3. **Host (Apresentação)** — API ASP.NET Core, controllers, middlewares e configuração de DI. Depende de `Core` e `Proxy`.
+
+### Padrões Aplicados
+
+- **BFF (Back-end for Front-end)** — Endpoint dedicado que agrega e adapta dados para o frontend.
+- **DDD** — Separação entre entidades, value objects, serviços de domínio e repositórios (quando aplicável).
+- **SOLID** — Injeção de dependência via construtores, responsabilidade única e inversão de dependência.
+- **Resiliência** — Fallback entre Febraban e BCB; cache com expiração deslizante e absoluta.
+- **Observabilidade** — OpenTelemetry + Serilog para tracing, métricas e logs estruturados.
+
+## Fluxo do Sistema
+
+```mermaid
+sequenceDiagram
+    participant FE as Frontend
+    participant BC as BacenController
+    participant BS as BacenService
+    participant CM as CacheManager
+    participant FC as FebrabanClient
+    participant BCb as BcbClient
+    participant FEB as Febraban API
+    participant BCB as BCB API
+
+    FE->>BC: GET /api/bacen?filter=
+    BC->>BS: GetBanksAsync(filter)
+    BS->>CM: GetOrCreateAsync("febrabanClientCache_...")
+    CM->>FC: GetBankAsync(filter)
+    FC->>FEB: POST /Associado/Index
+    FEB-->>FC: listaBancos[]
+    FC-->>CM: List<FebrabanBank>
+    CM-->>BS: cached/mapped
+    BS-->>BC: List<BankDto>
+    BC-->>FE: ApiResponse<BankDto[]>
+
+    alt Febraban indisponível
+        FC-->>BS: Exception
+        BS->>CM: GetOrCreateAsync("bcbClientCache_...")
+        CM->>BCb: GetBankAsync(filter)
+        BCb->>BCB: POST /pessoasJuridicas
+        BCB-->>BCb: content[]
+        BCb-->>CM: List<BcbBank>
+        CM-->>BS: cached/mapped
+    end
 ```
-src/
-├── Eaf.Template.Bff.Core/          # Domain logic and services
-│   ├── Models/                     # Domain models
-│   ├── Services/                   # Business logic
-│   ├── Extensions/                 # Utilities and extensions
-│   ├── Middlewares/                # Custom middleware
-│   └── Configurations/             # Configuration classes
-├── Eaf.Template.Bff.Host/         # API layer
-│   ├── Controllers/                # API controllers
-│   ├── Swagger/                   # API documentation
-│   └── Properties/                # Configuration files
-└── Eaf.Template.Bff.Proxy/        # External API clients
-    └── Bacen/                     # Bacen API integration
 
-tests/
-└── Eaf.Template.Bff.Tests/        # Unit and integration tests
-```
+## Como Rodar
 
-## Quick Start
+### Pré-requisitos
 
-### Prerequisites
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- Docker (opcional)
 
-- .NET 10.0 SDK
-- Docker (optional, for containerized deployment)
-- Git
-
-### Running Locally
+### Comandos
 
 ```bash
-# Clone the repository
-git clone https://github.com/afonsoft/bff.git
+# Clone
+https://github.com/afonsoft/bff.git
 cd bff
 
-# Restore dependencies
-dotnet restore
+# Restaurar
+dotnet restore Eaf.Template.Bff.sln
 
-# Build the solution
-dotnet build
+# Build
+dotnet build Eaf.Template.Bff.sln --configuration Release
 
-# Run the application
-dotnet run --project src/Eaf.Template.Bff.Host
-
-# Run tests
-dotnet test
-```
-
-### Docker Deployment
-
-```bash
-# Build the Docker image
-docker build -t eaf-template-bff .
-
-# Run the container
-docker run -d \
-  --name bff \
-  -p 5000:5000 \
-  -e DOTNET_PROCESSOR_COUNT=2 \
-  eaf-template-bff
-```
-
-## Code Coverage
-
-**Current Coverage: 5.72%** (57/995 lines covered)
-
-### Coverage Details
-- **Lines Covered**: 57
-- **Lines Valid**: 995
-- **Branch Coverage**: 1.82% (5/274 branches)
-- **Test Status**: 12 tests passing
-
-### Coverage by Project
-- **Eaf.Template.Bff.Core**: 6.24%
-- **Eaf.Template.Bff.Host**: 0% (no tests yet)
-- **Eaf.Template.Bff.Proxy**: 0% (no tests yet)
-
-## Testing
-
-### Running Tests
-
-```bash
-# Run all tests
-dotnet test
-
-# Run with coverage
-dotnet test --collect:"XPlat Code Coverage" --results-directory ./TestResults
-
-# Run specific test project
+# Testes
 dotnet test tests/Eaf.Template.Bff.Tests/Eaf.Template.Bff.Tests.csproj
+
+# Executar localmente
+dotnet run --project src/Eaf.Template.Bff.Host
 ```
 
-### Test Structure
+Acesse o Swagger em `http://localhost:4000/swagger` (ou porta configurada em `ASPNETCORE_URLS`).
 
-- **Unit Tests**: Testing individual components in isolation
-- **Integration Tests**: Testing component interactions
-- **BDD Style**: Behavior-Driven Development approach
-- **Mocking**: Using Moq for dependency isolation
-- **Assertions**: FluentAssertions for readable test code
+### Docker
 
-## Configuration
-
-### Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DOTNET_PROCESSOR_COUNT` | Number of CPU cores for processing | `2` |
-| `ASPNETCORE_URLS` | Application URLs | `http://+:4000` |
-| `DOTNET_URLS` | .NET URLs | `http://+:4000` |
-| `DOTNET_SYSTEM_GLOBALIZATION_INVARIANT` | Globalization invariant mode | `false` |
-
-### Application Settings
-
-- **Logging**: Serilog with structured JSON output
-- **Health Checks**: `/health` endpoint
-- **API Documentation**: Swagger UI at `/swagger`
-- **CORS**: Configured for frontend integration
-
-## API Endpoints
-
-### Bacen Integration
-
-```http
-GET /api/bacen?filter={filter}
+```bash
+docker build -t eaf-template-bff .
+docker run -d -p 5000:5000 -e DOTNET_PROCESSOR_COUNT=2 eaf-template-bff
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "response": [
-    {
-      "compe": "001",
-      "ispb": "00000000",
-      "name": "Banco do Brasil S.A.",
-      "code": "1",
-      "fullName": "Banco do Brasil S.A."
-    }
-  ]
-}
+### Variáveis de Ambiente Relevantes
+
+| Variável | Descrição | Padrão |
+|----------|-----------|--------|
+| `API_URL_BCB` | URL base do serviço BCB | `https://www3.bcb.gov.br/informes/rest/pessoasJuridicas` |
+| `API_URL_FEBRABAN` | URL base do serviço Febraban | `https://portal.febraban.org.br/Associado/Index` |
+| `ASPNETCORE_URLS` | URLs da aplicação | `http://+:4000` |
+| `DOTNET_PROCESSOR_COUNT` | Núcleos de CPU | `2` |
+
+## Testes e Cobertura
+
+```bash
+# Testes com cobertura
+dotnet test tests/Eaf.Template.Bff.Tests/Eaf.Template.Bff.Tests.csproj \
+  --collect:"XPlat Code Coverage" \
+  --results-directory ./TestResults
 ```
 
-## Security
+| Métrica | Valor |
+|---------|-------|
+| Total de Testes | 37 |
+| Testes Passando | 37 |
+| Cobertura de Linhas | 27,91% (211/756) |
+| Cobertura de Branches | 15,89% (41/258) |
+| Core | 26,44% |
+| Host | 7,22% |
+| Proxy | 86,11% |
 
-- **JWT Authentication**: Token-based authentication
-- **CORS**: Cross-origin resource sharing configuration
-- **Input Validation**: Request validation and sanitization
-- **Error Handling**: Centralized exception handling
+> A meta do projeto é atingir **90% de cobertura**. A camada `Proxy` já está bem coberta; `Core` e `Host` ainda precisam de testes adicionais para middlewares, controllers, extensões e configurações.
 
-## Performance
+## Visão de Negócio
 
-- **Caching**: Distributed caching with Redis support
-- **Circuit Breaker**: Resilience patterns for external APIs
-- **Async/Await**: Non-blocking operations throughout
-- **Optimized Docker**: Alpine Linux base image for smaller footprint
+O BFF atua como uma **fachada segura e resiliente** entre o frontend e os serviços públicos do sistema financeiro nacional. Ele reduz a complexidade da integração para o cliente, esconde diferenças de contrato entre Febraban e BCB, melhora a performance via cache e garante alta disponibilidade através de fallback automático.
 
-## Development
+## Visão Técnica
 
-### Code Quality
+- **Injeção de dependência**: Serviços e clientes são registrados via `ServiceCollectionExtensions`.
+- **Cache distribuído**: `CacheManager` serializa (Newtonsoft.Json) e comprime (GZip) valores antes de armazenar em `IDistributedCache`.
+- **Resiliência**: `HttpClient` do `IHttpClientFactory` com políticas do `Microsoft.Extensions.Http.Resilience`.
+- **Observabilidade**: `OpenTelemetryExtensions` configura tracing, métricas e exporters OTLP/Prometheus.
+- **Segurança**: JWT Bearer, CORS, headers sanitizados e middleware centralizado de exceções.
+- **Documentação**: Swagger com anotações e `ApiResponse<T>` padronizado.
 
-- **SOLID Principles**: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
-- **Clean Architecture**: Domain, Application, Infrastructure, Presentation layers
-- **Design Patterns**: Repository, Service, Factory, Strategy
-- **Code Analysis**: Static analysis and linting
+## Desenvolvedores / Contribuintes
 
-### Contributing
+Veja o histórico de contribuições em [CHANGELOG.md](./CHANGELOG.md).
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+## Licença
 
-Please read the [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+Este projeto está licenciado sob a licença MIT. Veja [LICENSE](./LICENSE).
 
-## License
+## Status do Projeto
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**Em desenvolvimento ativo.**
+
+- Build: passando
+- Testes: 37/37 passando
+- Vulnerabilidades: nenhuma detectada (`dotnet list package --vulnerable`)
+- Cobertura: em evolução (meta 90%)
 
 ## Links
 
-- **Repository**: https://github.com/afonsoft/bff
-- **Issues**: https://github.com/afonsoft/bff/issues
-- **Discussions**: https://github.com/afonsoft/bff/discussions
-- **Actions**: https://github.com/afonsoft/bff/actions
-
-## Project Status
-
-**Status**: Active Development
-
-- **Build**: Passing
-- **Tests**: 12/12 passing
-- **Coverage**: 5.72% (needs improvement)
-- **Code Quality**: Good
-- **Documentation**: Complete
-
----
-
-*Built with  using .NET 10.0 and modern development practices*
+- [CHANGELOG.md](./CHANGELOG.md)
+- [Documentação em português (docs/README.md)](./docs/README.md)
+- [Stack tecnológica (docs/technologies.md)](./docs/technologies.md)
+- [Pacotes e dependências (docs/packages.md)](./docs/packages.md)
+- [Funcionalidades (docs/features.md)](./docs/features.md)
+- [Referência da API (docs/api.md)](./docs/api.md)
+- [Issues](https://github.com/afonsoft/bff/issues)
+- [Actions](https://github.com/afonsoft/bff/actions)

@@ -9,6 +9,10 @@ on:
   schedule:
     - cron: "0 2 * * 1" # Weekly on Monday at 2 AM UTC
 
+env:
+  DOTNET_VERSION: "10.0.x"
+  SOLUTION: "Eaf.Template.Bff.sln"
+
 jobs:
   # CodeQL Analysis
   codeql:
@@ -26,7 +30,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: 🔍 Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -46,30 +50,34 @@ jobs:
   snyk:
     name: 🛡️ Snyk Security
     runs-on: ubuntu-latest
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: 🗄️ Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: 🔧 Restore Dependencies
-        run: dotnet restore Eaf.Template.Bff.sln --ignore-failed-sources
+        run: dotnet restore ${{ env.SOLUTION }} --ignore-failed-sources
 
       - name: 🛡️ Install Snyk CLI
+        if: env.SNYK_TOKEN != ''
         run: |
           curl -s https://static.snyk.io/cli/latest/snyk-linux -o snyk
           chmod +x ./snyk
           sudo mv ./snyk /usr/local/bin/
 
       - name: 🛡️ Run Snyk Security Scan
-        run: |
-          snyk test --severity-threshold=high --all-projects
+        if: env.SNYK_TOKEN != ''
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          snyk test --severity-threshold=high --all-projects
 
   # SonarQube Analysis
   sonarqube:
@@ -79,20 +87,20 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: 📦 Setup NuGet
-        uses: NuGet/setup-nuget@v2.0.1
+        uses: NuGet/setup-nuget@v2
 
       - name: 🗄️ Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: ☕ Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: "zulu"
@@ -111,34 +119,32 @@ jobs:
 
       - name: 🔍 Prepare analysis on SonarQube
         run: |
-          echo "🔍 Checking SonarQube configuration..."
-          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
-            echo "❌ SONAR_TOKEN is not set or empty"
+          if [ -z "${{ secrets.SONARQUBE_TOKEN }}" ]; then
+            echo "❌ SONARQUBE_TOKEN is not set or empty"
             echo "⚠️ Skipping SonarQube analysis"
             exit 0
           fi
 
-          echo "✅ SONAR_TOKEN is configured"
+          echo "✅ SONARQUBE_TOKEN is configured"
           dotnet sonarscanner begin \
             /o:"afonsoft" \
             /k:"afonsoft_bff" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.login="${{ secrets.SONARQUBE_TOKEN }}" \
             /d:sonar.scm.provider=git \
             /d:sonar.coverage.exclusions="**Test*.cs"
 
       - name: 🏗️ Build
-        run: dotnet build Eaf.Template.Bff.sln --configuration release
+        run: dotnet build ${{ env.SOLUTION }} --configuration release
 
       - name: 🔍 Run Code Analysis
         run: |
-          echo "🔍 Finalizing SonarQube analysis..."
-          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
-            echo "⚠️ SONAR_TOKEN not configured, skipping analysis"
+          if [ -z "${{ secrets.SONARQUBE_TOKEN }}" ]; then
+            echo "⚠️ SONARQUBE_TOKEN not configured, skipping analysis"
             exit 0
           fi
 
-          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONARQUBE_TOKEN }}"
 
   # Security Summary
   security-summary:

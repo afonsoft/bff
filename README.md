@@ -6,7 +6,7 @@
 ![.NET 10](https://img.shields.io/badge/.NET-10.0-purple)
 ![License](https://img.shields.io/github/license/afonsoft/bff)
 
-> **English (en-US)** is the default language for this README. A [Portuguese (pt-BR) version is available here](docs/README.md).
+> **English (en-US)** is the default language for this README. A [Portuguese (pt-BR) version is available here](docs/pt-BR/README.md).
 
 ## Project Description
 
@@ -28,7 +28,7 @@
 ├── tests/
 │   └── Eaf.Template.Bff.Tests/       # xUnit tests with Moq, FluentAssertions, Shouldly, and NSubstitute
 ├── .github/workflows/                  # CI/CD, quality, and security pipelines
-├── docs/                               # Complementary documentation in Portuguese
+├── docs/                               # Complementary documentation (en-US / pt-BR)
 ├── .claude/                            # Claude Code agent harness settings and rules
 ├── .devin/                             # Devin agent harness settings and hooks
 ├── CLAUDE.md                         # Agent harness index
@@ -213,10 +213,11 @@ This project is licensed under the MIT License. See [LICENSE](./LICENSE).
 ## Links
 
 - [CHANGELOG.md](./CHANGELOG.md)
-- [Portuguese documentation (docs/README.md)](./docs/README.md)
-- [Technology stack (docs/technologies.md)](./docs/technologies.md)
-- [Packages and dependencies (docs/packages.md)](./docs/packages.md)
-- [Features (docs/features.md)](./docs/features.md)
-- [API reference (docs/api.md)](./docs/api.md)
+- [Documentation index (docs/README.md)](./docs/README.md)
+- [Portuguese documentation (docs/pt-BR/README.md)](./docs/pt-BR/README.md)
+- [Technology stack (en-US)](./docs/en-US/technologies.md)
+- [Packages and dependencies (en-US)](./docs/en-US/packages.md)
+- [Features (en-US)](./docs/en-US/features.md)
+- [API reference (en-US)](./docs/en-US/api.md)
 - [Issues](https://github.com/afonsoft/bff/issues)
 - [Actions](https://github.com/afonsoft/bff/actions)

@@ -9,7 +9,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Added
 - Criação do harness de agentes para Devin e Claude Code (`.claude/`, `.devin/`, `CLAUDE.md`).
-- Documentação complementar em `docs/` (`README.md`, `technologies.md`, `packages.md`, `features.md`, `api.md`, `plugins.md`).
+- Documentação complementar bilíngue reorganizada em `docs/en-US/` e `docs/pt-BR/` (`README.md`, `technologies.md`, `packages.md`, `features.md`, `api.md`, `plugins.md`).
 - Novos testes unitários:
   - `BacenServiceTests` — cobertura de fallback Febraban/BCB e exceção agregada.
   - `BcbClientTests` e `FebrabanClientTests` — respostas válidas, vazias e erros HTTP.
@@ -41,7 +41,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
   - `code-quality.yml` — Qodana, SonarQube, Snyk e métricas de qualidade.
   - `security-scan.yml` — CodeQL, Snyk e SonarQube em agendamento; ações `github/codeql-action` atualizadas para v4.
   - `deploy-publish.yml` — ajustado para disparar apenas em tags `v*` e releases publicadas, substituído `actions/create-release` por `softprops/action-gh-release`, e adicionado `environment: production` ao job de build Docker.
-- `README.md` reescrito em inglês (en-US) como padrão; `docs/README.md` mantido em português (pt-BR) como tradução complementar.
+- `README.md` reescrito em inglês (en-US) como padrão; `docs/README.md` é o índice em inglês e `docs/pt-BR/README.md` a tradução complementar em português.
 
 ### Fixed
 - Correção de warnings de build:

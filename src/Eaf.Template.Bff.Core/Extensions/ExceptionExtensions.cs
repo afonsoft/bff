@@ -39,7 +39,7 @@ namespace System
         /// <param name="str">The string.</param>
         /// <param name="postFixes">one or more postfix.</param>
         /// <returns>Modified string or the same string if it has not any of given postfixes</returns>
-        public static string RemovePostFix(this string str, params string[] postFixes)
+        public static string? RemovePostFix(this string? str, params string[]? postFixes)
         {
             if (str == null)
             {

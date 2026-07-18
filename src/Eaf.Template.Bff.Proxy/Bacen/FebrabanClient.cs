@@ -9,13 +9,13 @@ namespace Eaf.Template.Bff.Proxy.Bacen
     /// </summary>
     public class FebrabanClient
     {
-        private string _baseUrl;
+        private string _baseUrl = string.Empty;
         private readonly HttpClient _httpClient;
 
         public FebrabanClient(HttpClient httpClient)
         {
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             BaseUrl = "https://portal.febraban.org.br/Associado/Index";
-            _httpClient = httpClient;
         }
 
         public string BaseUrl

@@ -9,6 +9,10 @@ on:
       - main
       - "releases/*"
 
+env:
+  DOTNET_VERSION: "10.0.x"
+  SOLUTION: "Eaf.Template.Bff.sln"
+
 jobs:
   # Qodana Analysis
   qodana:
@@ -21,16 +25,16 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: 🔍 Qodana Scan
         uses: JetBrains/qodana-action@v2025.3.1
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
-          args: --linter,qodana-community-for-net --baseline,qodana.sarif.json --fail-threshold,0
+          args: --linter qodana-cdnet --solution Eaf.Template.Bff.sln --baseline qodana.sarif.json --fail-threshold 0
           cache-default-branch-only: true
           upload-result: false
           primary-cache-key: qodana-2025.3-refs/heads/main-${{ github.sha }}
@@ -51,20 +55,20 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: 📦 Setup NuGet
-        uses: NuGet/setup-nuget@v2.0.1
+        uses: NuGet/setup-nuget@v2
 
       - name: 🗄️ Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: ☕ Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: "zulu"
@@ -83,53 +87,54 @@ jobs:
 
       - name: 🔍 Prepare analysis on SonarQube
         run: |
-          echo "🔍 Checking SonarQube configuration..."
-          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
-            echo "❌ SONAR_TOKEN is not set or empty"
+          if [ -z "${{ secrets.SONARQUBE_TOKEN }}" ]; then
+            echo "❌ SONARQUBE_TOKEN is not set or empty"
             echo "⚠️ Skipping SonarQube analysis"
             exit 0
           fi
 
-          echo "✅ SONAR_TOKEN is configured"
+          echo "✅ SONARQUBE_TOKEN is configured"
           dotnet sonarscanner begin \
             /o:"afonsoft" \
             /k:"afonsoft_bff" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.login="${{ secrets.SONARQUBE_TOKEN }}" \
             /d:sonar.scm.provider=git \
             /d:sonar.coverage.exclusions="**Test*.cs"
 
       - name: 🏗️ Build
-        run: dotnet build Eaf.Template.Bff.sln --configuration release
+        run: dotnet build ${{ env.SOLUTION }} --configuration release
 
       - name: 🔍 Run Code Analysis
         run: |
-          echo "🔍 Finalizing SonarQube analysis..."
-          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
-            echo "⚠️ SONAR_TOKEN not configured, skipping analysis"
+          if [ -z "${{ secrets.SONARQUBE_TOKEN }}" ]; then
+            echo "⚠️ SONARQUBE_TOKEN not configured, skipping analysis"
             exit 0
           fi
 
-          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONARQUBE_TOKEN }}"
 
   # Snyk Security Analysis
   snyk:
     name: 🛡️ Snyk Security
     runs-on: ubuntu-latest
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: 🗄️ Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: 🔧 Restore Dependencies
-        run: dotnet restore Eaf.Template.Bff.sln --ignore-failed-sources
+        run: dotnet restore ${{ env.SOLUTION }} --ignore-failed-sources
 
       - name: 🛡️ Run Snyk
+        if: env.SNYK_TOKEN != ''
         uses: snyk/actions/dotnet@master
         continue-on-error: true
         env:
@@ -139,8 +144,8 @@ jobs:
           args: --file=Eaf.Template.Bff.sln --severity-threshold=high --sarif-file-output=snyk.sarif --json-output=snyk.json
 
       - name: 📊 Upload Snyk Results
-        uses: github/codeql-action/upload-sarif@v4
-        if: always() && hashFiles('snyk.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        if: env.SNYK_TOKEN != '' && always() && hashFiles('snyk.sarif') != ''
         with:
           sarif_file: snyk.sarif
           category: snyk
@@ -154,29 +159,26 @@ jobs:
           if [ -f "snyk.json" ]; then
             echo "### 📊 Vulnerability Summary" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            
-            # Extract summary from JSON
+
             VULNS=$(cat snyk.json | jq -r '.results[0].vulnerabilities | length' 2>/dev/null || echo "0")
             DEPS=$(cat snyk.json | jq -r '.results[0].dependencies | length' 2>/dev/null || echo "0")
-            
+
             echo "- **Dependencies Analyzed**: $DEPS" >> $GITHUB_STEP_SUMMARY
             echo "- **Vulnerabilities Found**: $VULNS" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            
+
             if [ "$VULNS" -gt 0 ]; then
               echo "### ⚠️ Vulnerabilities Detected" >> $GITHUB_STEP_SUMMARY
               echo "" >> $GITHUB_STEP_SUMMARY
-              
-              # Extract vulnerability details
-              cat snyk.json | jq -r '.results[0].vulnerabilities[] | 
+
+              cat snyk.json | jq -r '.results[0].vulnerabilities[] |
                 "- **\(.severity | ascii_upcase)**: \(.title) in \(.package)@\(.version)"' 2>/dev/null | head -10 >> $GITHUB_STEP_SUMMARY
-              
+
               echo "" >> $GITHUB_STEP_SUMMARY
               echo "### 🔧 Affected Projects" >> $GITHUB_STEP_SUMMARY
               echo "" >> $GITHUB_STEP_SUMMARY
-              
-              # Extract affected projects
-              cat snyk.json | jq -r '.results[0].vulnerabilities[] | 
+
+              cat snyk.json | jq -r '.results[0].vulnerabilities[] |
                 "- \(.from[0] | split("/")[-1])"' 2>/dev/null | sort -u >> $GITHUB_STEP_SUMMARY
             else
               echo "✅ **No vulnerabilities found!** All dependencies are secure." >> $GITHUB_STEP_SUMMARY
@@ -188,7 +190,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📋 Scan Configuration" >> $GITHUB_STEP_SUMMARY
           echo "- **Severity Threshold**: High" >> $GITHUB_STEP_SUMMARY
-          echo "- **Target**: Eaf.Template.Bff.sln" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target**: ${{ env.SOLUTION }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Scanner**: Snyk .NET" >> $GITHUB_STEP_SUMMARY
 
   # Code Quality Metrics
@@ -198,33 +200,26 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: 🗄️ Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: 🔧 Restore Dependencies
-        run: dotnet restore Eaf.Template.Bff.sln --ignore-failed-sources
+        run: dotnet restore ${{ env.SOLUTION }} --ignore-failed-sources
 
       - name: 🏗️ Build Solution
-        run: dotnet build Eaf.Template.Bff.sln --configuration Release --no-restore --verbosity minimal
+        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore --verbosity minimal
 
       - name: 📊 Calculate Metrics
         run: |
           echo "📊 Analyzing code quality metrics..."
 
-          # Count lines of code
           echo "Lines of Code: $(find src -name '*.cs' -exec wc -l {} + | tail -1 | awk '{print $1}')"
-
-          # Count test files
           echo "Test Files: $(find tests -name '*Tests.cs' | wc -l)"
-
-          # Count projects
           echo "Projects: $(find src -name '*.csproj' | wc -l)"
-
-          # Check for TODO comments
           echo "TODO Comments: $(grep -r 'TODO' src --include='*.cs' | wc -l)"
 
           echo "Quality metrics analysis completed!"

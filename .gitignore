@@ -131,3 +131,10 @@ src/.vs/config/applicationhost.config
 /tools
 .sonarqube/*
 generate/
+
+# Agent harness local overrides
+CLAUDE.local.md
+.claude/settings.local.json
+.devin/config.local.json
+.devin/secrets/
+.claude/secrets/

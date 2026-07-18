@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.Http
             context.Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
 
             bool showExceptionDetails = _configuration.GetValue<bool?>("ShowExceptionDetails") ?? false;
-            
+
             // Also check for debug header
             if (context.Request.Headers.TryGetValue("debug", out var debugHeader))
             {

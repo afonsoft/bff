@@ -66,7 +66,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     .AddCircuitBreaker(circuitBreaker)
                     .AddTimeout(timeoutStrategy);
             });
-            
+
             // Configure individual clients with resilience
             services.AddHttpClient<FebrabanClient>()
                 .AddStandardResilienceHandler(configure =>
@@ -82,8 +82,8 @@ namespace Microsoft.Extensions.DependencyInjection
                     configure.CircuitBreaker = circuitBreaker;
                     configure.TotalRequestTimeout = timeoutStrategy;
                 });
-            
-            #pragma warning disable CS8603 // Possível retorno de referência nula.
+
+#pragma warning disable CS8603 // Possível retorno de referência nula.
         }
     }
 }

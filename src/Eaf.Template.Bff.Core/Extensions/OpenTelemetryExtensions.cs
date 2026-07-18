@@ -42,16 +42,16 @@ namespace Microsoft.Extensions.DependencyInjection
                     // Add custom sources for application-specific tracing
                     builder.AddSource("Eaf.Template.Bff.*")
                         .AddSource("Eaf.Template.Bff.Host");
-                    
+
                     // Configure ASP.NET Core instrumentation with exception recording
                     builder.AddAspNetCoreInstrumentation();
-                    
+
                     // Configure Entity Framework Core instrumentation
                     builder.AddEntityFrameworkCoreInstrumentation();
-                    
+
                     // Configure HttpClient instrumentation with detailed tracing
                     builder.AddHttpClientInstrumentation();
-                    
+
                     // Configure runtime instrumentation
                     // builder.AddRuntimeInstrumentation(); // Commented out due to API incompatibility
                 })
@@ -60,18 +60,18 @@ namespace Microsoft.Extensions.DependencyInjection
                     // Add ASP.NET Core metrics
                     builder.AddAspNetCoreInstrumentation()
                         .AddHttpClientInstrumentation();
-                        // .AddRuntimeInstrumentation(); // Commented out due to API incompatibility
-                    
+                    // .AddRuntimeInstrumentation(); // Commented out due to API incompatibility
+
                     // Add system metrics
                     builder.AddMeter("Microsoft.AspNetCore.Hosting")
                         .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
                         .AddMeter("System.Net.Http")
                         .AddMeter("System.Net.Sockets");
-                    
+
                     // Add application-specific metrics
                     builder.AddMeter("Eaf.Template.Bff.*")
                         .AddMeter("Eaf.Template.Bff.Host");
-                    
+
                     // Configure exporters for metrics and traces
                     builder.AddPrometheusExporter()
                         .AddOtlpExporter();
